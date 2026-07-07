@@ -184,9 +184,13 @@ It can be overridden on a per-hub basis in the Favorite Hub Properties.</string>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
         <property name="toolTip">
-         <string>This drop-down contains a number of common upload speeds (in MiB/s),
-please choose the one closest to your own.
+         <string>Pick a common upload speed (in MiB/s) or type your own.
+Note: MiB/s, not Mbps -- divide your ISP-advertised speed by 8
+(e.g. 200 Mbps upload is 25 MiB/s).
 Do not put in your download speed; this setting is a measure
 of how fast a source you are likely to be for other users.</string>
         </property>

@@ -10,6 +10,7 @@
 #include "SettingsPersonal.h"
 
 #include <QComboBox>
+#include <QDoubleValidator>
 
 #include "dcpp/stdinc.h"
 #include "dcpp/SettingsManager.h"
@@ -37,7 +38,7 @@ void SettingsPersonal::ok(){
     SM->set(SettingsManager::NICK, lineEdit_NICK->text().toStdString());
     SM->set(SettingsManager::EMAIL, lineEdit_EMAIL->text().toStdString());
     SM->set(SettingsManager::DESCRIPTION, lineEdit_DESC->text().toStdString());
-    SM->set(SettingsManager::UPLOAD_SPEED, SettingsManager::connectionSpeeds[comboBox_SPEED->currentIndex()]);
+    SM->set(SettingsManager::UPLOAD_SPEED, comboBox_SPEED->currentText().toStdString());
     SM->set(SettingsManager::DEFAULT_AWAY_MESSAGE, lineEdit_AWAYMSG->text().toStdString());
 
     QString enc = comboBox_ENC->currentText();
@@ -68,10 +69,13 @@ void SettingsPersonal::init(){
 
     for (auto i = SettingsManager::connectionSpeeds.begin(); i != SettingsManager::connectionSpeeds.end(); ++i){
         comboBox_SPEED->addItem((*i).c_str());
-
-        if (SETTING(UPLOAD_SPEED) == *i)
-            comboBox_SPEED->setCurrentIndex(i - SettingsManager::connectionSpeeds.begin());
     }
+
+    QDoubleValidator *speedValidator = new QDoubleValidator(0.001, 100000, 3, comboBox_SPEED);
+    speedValidator->setNotation(QDoubleValidator::StandardNotation);
+    speedValidator->setLocale(QLocale::c());
+    comboBox_SPEED->setValidator(speedValidator);
+    comboBox_SPEED->setCurrentText(SETTING(UPLOAD_SPEED).c_str());
 
     QStringList encodings = WulforUtil::getInstance()->encodings();
 
