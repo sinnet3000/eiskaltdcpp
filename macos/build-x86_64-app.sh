@@ -88,11 +88,13 @@ codesign --verify --deep --strict "$TARGET"
 
 # 4. Package DMG
 echo "==> Step 4: Packaging DMG..."
-rm -rf dmg_stage "EiskaltDC++-x86_64.dmg"
+VERSION=$(git -C "$REPO_ROOT" describe --tags 2>/dev/null | sed -e 's/^v//')
+DMG_NAME="EiskaltDC++-${VERSION:-unknown}-x86_64.dmg"
+rm -rf dmg_stage "$DMG_NAME"
 mkdir -p dmg_stage
 cp -a "$TARGET" dmg_stage/
 ln -s /Applications dmg_stage/Applications
-hdiutil create -fs HFS+ -srcfolder dmg_stage -volname "EiskaltDC++" "EiskaltDC++-x86_64.dmg"
+hdiutil create -fs HFS+ -srcfolder dmg_stage -volname "EiskaltDC++" "$DMG_NAME"
 rm -rf dmg_stage
 
-echo "==> Success! DMG packaged at builddir-x64/EiskaltDC++-x86_64.dmg"
+echo "==> Success! DMG packaged at builddir-x64/$DMG_NAME"
