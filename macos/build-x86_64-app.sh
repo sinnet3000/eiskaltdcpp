@@ -39,33 +39,18 @@ cmake .. \
 
 cmake --build . --target all -- -j$(sysctl -n hw.ncpu)
 
-# 3. Create DMG
-echo "==> Step 3: Packaging DMG with cpack..."
-cpack -G DragNDrop
+# 3. Stage and fix app bundle
+echo "==> Step 3: Staging and fixing app bundle..."
+cmake --build . --target install
 
-# 4. Deploy and install
-echo "==> Step 4: Installing to /Applications and fixing library rpaths..."
-TARGET="/Applications/EiskaltDC++.app"
-
-hdiutil attach EiskaltDC++-*.dmg -nobrowse -mountpoint /tmp/eiskalt_x64
-
-# Suppress errors if not running
-pkill -f "EiskaltDC\+\+.app/Contents/MacOS" || true
-
-rm -rf "$TARGET"
-cp -a "/tmp/eiskalt_x64/EiskaltDC++.app" "$TARGET"
-hdiutil detach /tmp/eiskalt_x64
-
-# Clear any Gatekeeper quarantine attributes added during DMG extraction
-# so macOS doesn't block the ad-hoc signed app on first launch.
-xattr -cr "$TARGET"
+TARGET="install/EiskaltDC++.app"
 
 # macdeployqt bundles the Qt frameworks but doesn't add the rpath needed to find
 # them -- without this the app crashes on launch with "Library not loaded:
 # @rpath/QtWidgets.framework ... no LC_RPATH's found".
 install_name_tool -add_rpath "@executable_path/../Frameworks" "$TARGET/Contents/MacOS/EiskaltDC++"
 
-# macdeployqt (via cpack) misses our custom vendored dylibs (like miniupnpc, pcre2)
+# macdeployqt misses our custom vendored dylibs (like miniupnpc, pcre2)
 # because of how their install names are configured. We manually copy them here.
 #
 # These were built with an absolute --prefix="$VENDOR", so both their own install
@@ -97,10 +82,16 @@ for lib in "${VENDOR_DYLIBS[@]}"; do
 done
 install_name_tool "${CHANGES[@]}" "$TARGET/Contents/MacOS/EiskaltDC++" 2>/dev/null || true
 
-# cpack's ad-hoc signature goes stale the moment frameworks/resources are added
-# after the fact, and install_name_tool above invalidates it again -- always
-# re-sign last, after all bundle contents are final.
+# Always re-sign last, after all bundle contents are final.
 codesign --force --deep --sign - "$TARGET"
 codesign --verify --deep --strict "$TARGET"
 
-echo "==> Success! Application installed to $TARGET"
+# 4. Package DMG
+echo "==> Step 4: Packaging DMG..."
+mkdir -p dmg_stage
+cp -a "$TARGET" dmg_stage/
+ln -s /Applications dmg_stage/Applications
+hdiutil create -fs HFS+ -srcfolder dmg_stage -volname "EiskaltDC++" "EiskaltDC++-x86_64.dmg"
+rm -rf dmg_stage
+
+echo "==> Success! DMG packaged at builddir-x64/EiskaltDC++-x86_64.dmg"
