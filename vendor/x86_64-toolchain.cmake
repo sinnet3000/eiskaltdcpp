@@ -1,7 +1,7 @@
 if(DEFINED ENV{VENDOR})
     set(VENDOR "$ENV{VENDOR}")
 else()
-    set(VENDOR "$ENV{HOME}/git/labs/eiskaltdcpp/vendor/x86_64")
+    set(VENDOR "${CMAKE_CURRENT_LIST_DIR}/x86_64")
 endif()
 
 if(DEFINED ENV{QTDIR})

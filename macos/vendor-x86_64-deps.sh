@@ -6,7 +6,9 @@ set -e
 # We avoid Homebrew for these because Homebrew only keeps the latest Qt5 (5.15),
 # dropped openssl@1.1 completely when it reached EOL, and defaults to arm64.
 
-VENDOR="$HOME/git/labs/eiskaltdcpp/vendor/x86_64"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+VENDOR="${VENDOR:-$REPO_ROOT/vendor/x86_64}"
 NCPU=$(sysctl -n hw.ncpu)
 
 export CC="clang -arch x86_64"

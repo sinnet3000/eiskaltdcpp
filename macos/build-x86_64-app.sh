@@ -7,14 +7,16 @@ bash macos/vendor-x86_64-deps.sh
 
 # 2. Build the project
 echo "==> Step 2: Configuring and building project..."
+REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+
 export PATH="/opt/homebrew/opt/coreutils/libexec/gnubin:${PATH}"
 export HOMEBREW=/opt/homebrew
-export VENDOR="$HOME/git/labs/eiskaltdcpp/vendor/x86_64"
+export VENDOR="${VENDOR:-$REPO_ROOT/vendor/x86_64}"
 export QTDIR="$VENDOR/qt-src/5.14.1/clang_64"
 export OSX_DEPLOYMENT_TARGET=10.15
 
 # Go to project root
-cd "$(dirname "$0")/.."
+cd "$REPO_ROOT"
 
 rm -rf builddir-x64 && mkdir builddir-x64 && cd builddir-x64
 
@@ -24,7 +26,7 @@ rm -rf builddir-x64 && mkdir builddir-x64 && cd builddir-x64
 # compatibility era from the executable's declared SDK version — without this flag spinboxes
 # render as flat modern boxes instead of the classic macOS blue rounded stepper.
 cmake .. \
-  -DCMAKE_TOOLCHAIN_FILE="$HOME/git/labs/eiskaltdcpp/vendor/x86_64-toolchain.cmake" \
+  -DCMAKE_TOOLCHAIN_FILE="$REPO_ROOT/vendor/x86_64-toolchain.cmake" \
   -DCMAKE_BUILD_TYPE=Release \
   -DUSE_QT=OFF -DUSE_QT5=ON -DUSE_QT_SQLITE=ON \
   -DUSE_MINIUPNP=ON -DUSE_ASPELL=ON -DUSE_PROGRESS_BARS=OFF \
