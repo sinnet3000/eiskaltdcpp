@@ -20,7 +20,9 @@ else()
         ERROR_QUIET
     )
     if(NOT HOMEBREW)
-        set(HOMEBREW "/opt/homebrew")
+        # This toolchain targets x86_64, where Homebrew's default prefix is
+        # /usr/local (not /opt/homebrew, which is Apple Silicon's default).
+        set(HOMEBREW "/usr/local")
     endif()
 endif()
 
