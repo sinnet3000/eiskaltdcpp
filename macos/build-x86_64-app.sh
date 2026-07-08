@@ -88,6 +88,7 @@ codesign --verify --deep --strict "$TARGET"
 
 # 4. Package DMG
 echo "==> Step 4: Packaging DMG..."
+rm -rf dmg_stage "EiskaltDC++-x86_64.dmg"
 mkdir -p dmg_stage
 cp -a "$TARGET" dmg_stage/
 ln -s /Applications dmg_stage/Applications

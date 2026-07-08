@@ -18,13 +18,13 @@ echo "==> Deploying $DMG to /Applications..."
 TARGET="/Applications/EiskaltDC++.app"
 
 hdiutil attach "$DMG" -nobrowse -mountpoint /tmp/eiskalt_x64
+trap 'hdiutil detach /tmp/eiskalt_x64 2>/dev/null || true' EXIT
 
 # Suppress errors if not running
 pkill -f "EiskaltDC\+\+.app/Contents/MacOS" || true
 
 rm -rf "$TARGET"
 cp -a "/tmp/eiskalt_x64/EiskaltDC++.app" "$TARGET"
-hdiutil detach /tmp/eiskalt_x64
 
 # Clear any Gatekeeper quarantine attributes
 xattr -cr "$TARGET"
