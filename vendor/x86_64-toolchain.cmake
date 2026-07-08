@@ -69,4 +69,7 @@ set(CMAKE_OSX_ARCHITECTURES "${OSX_ARCHITECTURES}"
 set(CMAKE_OSX_DEPLOYMENT_TARGET "${OSX_DEPLOYMENT_TARGET}"
     CACHE STRING "CMAKE_OSX_DEPLOYMENT_TARGET")
 
-set(CMAKE_INSTALL_PREFIX "${HOMEBREW}" CACHE PATH "Installation Prefix")
+# Default to an isolated folder under the build dir, not the Homebrew prefix --
+# an accidental manual `make install` (instead of `cpack`) would otherwise
+# overwrite files in the system's Homebrew installation.
+set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install" CACHE PATH "Installation Prefix")
