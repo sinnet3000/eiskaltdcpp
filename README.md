@@ -1,5 +1,7 @@
 # EiskaltDC++ &ndash; file sharing program using Direct Connect protocols
 
+> **Fork Notice:** This repository is a fork of the official `eiskaltdcpp/eiskaltdcpp`. It includes 80+ upstream changes up until commit [`697db4b0...`](https://github.com/eiskaltdcpp/eiskaltdcpp/commit/697db4b03e3d9ffa48b3d4c74fd043dee7663266), plus our own local improvements (most notably, native build scripts and a packaged release for macOS x86_64). For the full list of changes, please see the [Changelog](CHANGELOG.md).
+
 Website: [https://github.com/eiskaltdcpp/eiskaltdcpp](https://github.com/eiskaltdcpp/eiskaltdcpp) <br>
 Sources: [https://github.com/eiskaltdcpp/eiskaltdcpp](https://github.com/eiskaltdcpp/eiskaltdcpp)
 
