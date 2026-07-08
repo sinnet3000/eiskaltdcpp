@@ -75,18 +75,27 @@ install_name_tool -add_rpath "@executable_path/../Frameworks" "$TARGET/Contents/
 shopt -s nullglob
 VENDOR_DYLIBS=("$VENDOR"/lib/*.dylib)
 shopt -u nullglob
+
+# Build the full set of -change flags once so each Mach-O file only gets
+# rewritten a single time instead of once per dependency.
+CHANGES=()
+for dep in "${VENDOR_DYLIBS[@]}"; do
+    depname="$(basename "$dep")"
+    CHANGES+=(-change "$VENDOR/lib/$depname" "@rpath/$depname")
+done
+
 for lib in "${VENDOR_DYLIBS[@]}"; do
     libname="$(basename "$lib")"
     dest="$TARGET/Contents/Frameworks/$libname"
-    cp -L "$lib" "$dest"
+    # -P preserves symlinks (e.g. libssl.dylib -> libssl.1.1.dylib): dereferencing
+    # them with -L would produce a second, independent copy with its own
+    # LC_ID_DYLIB, and both could end up loaded simultaneously at runtime.
+    cp -P "$lib" "$dest"
+    [ -h "$dest" ] && continue
     chmod +w "$dest"
-    install_name_tool -id "@rpath/$libname" "$dest"
-    for dep in "${VENDOR_DYLIBS[@]}"; do
-        depname="$(basename "$dep")"
-        install_name_tool -change "$VENDOR/lib/$depname" "@rpath/$depname" "$dest" 2>/dev/null || true
-    done
-    install_name_tool -change "$VENDOR/lib/$libname" "@rpath/$libname" "$TARGET/Contents/MacOS/EiskaltDC++" 2>/dev/null || true
+    install_name_tool -id "@rpath/$libname" "${CHANGES[@]}" "$dest"
 done
+install_name_tool "${CHANGES[@]}" "$TARGET/Contents/MacOS/EiskaltDC++" 2>/dev/null || true
 
 # cpack's ad-hoc signature goes stale the moment frameworks/resources are added
 # after the fact, and install_name_tool above invalidates it again -- always
