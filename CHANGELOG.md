@@ -5,8 +5,8 @@ Everything that's changed since the `v2.4.2` release in March 2021, plus what's 
 ## Unreleased / next branch (as of July 7, 2026)
 
 ### On the `next` branch
-* Upload speed is no longer limited to fixed presets; you can set it to whatever value you want.
-* Added native macOS build scripts that vendor and rebuild the x86_64 app against the original toolchain, handle library install paths, and produce a signed DMG.
+* The "Line speed (upload)" field under Preferences -> Personal is no longer limited to fixed presets; you can set it to whatever value you want.
+* Added native macOS build scripts that vendor and rebuild the x86_64 app against the original toolchain, handle library install paths, and produce a self-signed (ad-hoc, not notarized) DMG.
 
 ### Core changes
 
