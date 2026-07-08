@@ -5,3 +5,5 @@ CMakeLists.txt.user*
 build*/
 boost*
 tags
+.kata.local.toml
+vendor/
