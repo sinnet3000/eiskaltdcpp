@@ -13,7 +13,15 @@ endif()
 if(DEFINED ENV{HOMEBREW})
     set(HOMEBREW "$ENV{HOMEBREW}")
 else()
-    set(HOMEBREW "/opt/homebrew")
+    execute_process(
+        COMMAND brew --prefix
+        OUTPUT_VARIABLE HOMEBREW
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+    )
+    if(NOT HOMEBREW)
+        set(HOMEBREW "/opt/homebrew")
+    endif()
 endif()
 
 if(DEFINED ENV{OSX_DEPLOYMENT_TARGET})

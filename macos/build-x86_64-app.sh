@@ -9,8 +9,8 @@ bash macos/vendor-x86_64-deps.sh
 echo "==> Step 2: Configuring and building project..."
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
-export PATH="/opt/homebrew/opt/coreutils/libexec/gnubin:${PATH}"
-export HOMEBREW=/opt/homebrew
+export HOMEBREW="${HOMEBREW:-$(brew --prefix)}"
+export PATH="$HOMEBREW/opt/coreutils/libexec/gnubin:${PATH}"
 export VENDOR="${VENDOR:-$REPO_ROOT/vendor/x86_64}"
 export QTDIR="$VENDOR/qt-src/5.14.1/clang_64"
 export OSX_DEPLOYMENT_TARGET=10.15
