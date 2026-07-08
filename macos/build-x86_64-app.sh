@@ -65,9 +65,28 @@ xattr -cr "$TARGET"
 # @rpath/QtWidgets.framework ... no LC_RPATH's found".
 install_name_tool -add_rpath "@executable_path/../Frameworks" "$TARGET/Contents/MacOS/EiskaltDC++"
 
-# macdeployqt (via cpack) misses our custom vendored dylibs (like miniupnpc, pcre2) 
+# macdeployqt (via cpack) misses our custom vendored dylibs (like miniupnpc, pcre2)
 # because of how their install names are configured. We manually copy them here.
-cp -L "$VENDOR/lib/"*.dylib "$TARGET/Contents/Frameworks/" 2>/dev/null || true
+#
+# These were built with an absolute --prefix="$VENDOR", so both their own install
+# name (LC_ID_DYLIB) and the main executable's load commands (LC_LOAD_DYLIB) still
+# point at "$VENDOR/lib/...", which won't exist on another machine. Rewrite both
+# to @rpath so the bundle is self-contained.
+shopt -s nullglob
+VENDOR_DYLIBS=("$VENDOR"/lib/*.dylib)
+shopt -u nullglob
+for lib in "${VENDOR_DYLIBS[@]}"; do
+    libname="$(basename "$lib")"
+    dest="$TARGET/Contents/Frameworks/$libname"
+    cp -L "$lib" "$dest"
+    chmod +w "$dest"
+    install_name_tool -id "@rpath/$libname" "$dest"
+    for dep in "${VENDOR_DYLIBS[@]}"; do
+        depname="$(basename "$dep")"
+        install_name_tool -change "$VENDOR/lib/$depname" "@rpath/$depname" "$dest" 2>/dev/null || true
+    done
+    install_name_tool -change "$VENDOR/lib/$libname" "@rpath/$libname" "$TARGET/Contents/MacOS/EiskaltDC++" 2>/dev/null || true
+done
 
 # cpack's ad-hoc signature goes stale the moment frameworks/resources are added
 # after the fact, and install_name_tool above invalidates it again -- always
